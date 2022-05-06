@@ -1,0 +1,50 @@
+import { createSlice } from "@reduxjs/toolkit";
+import cartItems from "../../cartItems";
+
+const initialState = {
+    cartItems: cartItems,
+    amount: 2, // items amount of that specific product in the cart
+    total: 0,
+    isLoading: true,
+}
+
+const cartSlice = createSlice({
+    name: 'cart',
+    initialState,
+    // we can have as many reducers as we want
+    reducers: {
+        // name of our custom reducer (actions)
+        clearCart: (state) => {
+            // we want to set the cart items to an empty array when sending (dispatch) 
+            // clearCart reducer
+            state.cartItems = []
+        },
+        removeItem: (state, action) => {
+            const itemId = action.payload;
+            state.cartItems = state.cartItems.filter((item) => item.id !== itemId);
+        },
+        increase: (state, {payload}) => {
+            const cartItem = state.cartItems.find((item) => item.id === payload.id);
+            cartItem.amount = cartItem.amount + 1;
+        },
+        decrease: (state, {payload}) => {
+            const cartItem = state.cartItems.find((item) => item.id === payload.id);
+            cartItem.amount = cartItem.amount - 1;
+        },
+        calculateTotals: (state) => {
+            let amount = 0;
+            let total = 0;
+            state.cartItems.forEach((item) => {
+                amount += item.amount;
+                total += item.amount * item.price;
+            })
+            state.amount = amount;
+            state.total = total;
+        }
+    }
+})
+
+// console.log(cartSlice.actions); // clearCart
+export const { clearCart, removeItem, increase, decrease, calculateTotals } = cartSlice.actions;
+
+export default cartSlice.reducer;
